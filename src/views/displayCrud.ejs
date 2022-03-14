@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get User</title>
+    <style>
+        table, th, td {
+          border: 1px solid black;
+          border-collapse: collapse;
+        }
+        .btn {
+          position: relative;
+          display: inline-block;
+          border-radius: 5px;
+          text-decoration: none;
+          text-align: center;
+          border: none;
+          cursor: pointer;
+          min-width: 80px;
+          
+        }
+        .btn-edit{
+          background-color: blue;
+        }
+        .btn-delete{
+          background-color: red;
+         
+        }
+        
+    </style>
+</head>
+<body>
+    <table style="width:100%">
+        <tr>
+          <th>Email</th>
+          <th>FirstName</th> 
+          <th>LastName</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+        <% for(let i=0; i < dataTable.length; i++) { %>
+            <tr>
+              <td><%= dataTable[i].email %></td>
+              <td><%= dataTable[i].firstName %></td>
+              <td><%= dataTable[i].lastName %></td>
+              <td><%= dataTable[i].address %></td>
+              <td class="btn-action">
+                  <a href="/edit-crud?id=<%= dataTable[i].id %>" class="btn btn-edit">Edit</a>
+                  <a href="/delete-crud?id=<%= dataTable[i].id %>" class="btn btn-delete">delete</a>
+              </td>
+            </tr>
+         <% } %>
+      </table>
+</body>
+</html>
