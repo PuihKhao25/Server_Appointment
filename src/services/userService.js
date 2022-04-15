@@ -68,14 +68,14 @@ let getAllUsers = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let users = '';
-            if (userId === 'All') {
+            if (userId === 'ALL') {
                 users = await db.User.findAll({
                     attributes: {
                         exclude: ['password']
                     }
                 })
             }
-            if (userId && userId !== 'All') {
+            if (userId && userId !== 'ALL') {
                 users = await db.User.findOne({
                     where: { id: userId },
                     attributes: {
@@ -114,7 +114,8 @@ let createNewUser = async (data) => {
                     phoneNumber: data.phoneNumber,
                     gender: data.gender,
                     roleId: data.roleId,
-                    positionId: data.positionId
+                    positionId: data.positionId,
+                    image: data.avatar
                 })
                 resolve({
                     errCode: 0,
@@ -167,7 +168,7 @@ let deleteUser = (userId) => {
 let updateUserData = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.id) {
+            if (!data.id || !data.roleId || !data.positionId || !data.gender) {
                 resolve({
                     errCode: 2,
                     errMessage: ' User not exist'
@@ -181,6 +182,14 @@ let updateUserData = (data) => {
                 user.firstName = data.firstName;
                 user.lastName = data.lastName;
                 user.address = data.address;
+                user.roleId = data.roleId;
+                user.positionId = data.positionId;
+                user.gender = data.gender;
+                user.phoneNumber = data.phoneNumber;
+                if(data.avatar){
+                      user.image =data.avatar; 
+                }
+             
 
                 await user.save()
                 resolve({
