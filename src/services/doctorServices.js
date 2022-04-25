@@ -27,11 +27,11 @@ let getTopDoctorHome = (limitInput) => {
     })
 }
 
-let getAllDoctors =() =>{
-    return new Promise(async(resolve,reject)=>{
+let getAllDoctors = () => {
+    return new Promise(async (resolve, reject) => {
         try {
             let doctors = await db.User.findAll({
-                where: {roleId: 'R2'},
+                where: { roleId: 'R2' },
                 attributes: {
                     exclude: ['password', 'image']
                 },
@@ -48,14 +48,14 @@ let getAllDoctors =() =>{
 }
 
 let saveDetailInforDoctors = (inputData) => {
-    return new Promise(async(resolve,reject)=>{
+    return new Promise(async (resolve, reject) => {
         try {
-            if(!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown){
+            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown) {
                 resolve({
-                    errCode:1,
+                    errCode: 1,
                     errMessage: 'Missing parameter'
                 })
-            }else{
+            } else {
                 await db.Markdown.create({
                     contentHTML: inputData.contentHTML,
                     contentMarkdown: inputData.contentMarkdown,
@@ -63,8 +63,8 @@ let saveDetailInforDoctors = (inputData) => {
                     doctorId: inputData.doctorId
                 })
                 resolve({
-                    errCode:0,
-                    errMessage:'Save infor doctor successed!'
+                    errCode: 0,
+                    errMessage: 'Save infor doctor successed!'
                 })
             }
         } catch (e) {
@@ -72,8 +72,49 @@ let saveDetailInforDoctors = (inputData) => {
         }
     })
 }
+
+let getDetailDoctorById = (inputId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!inputId) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing require parameter!'
+                })
+            } else {
+                let data = await db.User.findOne({
+                    where: {
+                        id: inputId
+                    },
+                    attributes: {
+                        exclude: ['password']
+                    },
+                    include: [
+                        { model: db.Markdown, attributes: ['description', 'contentHTML', 'contentMarkdown'] },
+                        { model: db.allcodes, as: 'positionData', attributes: ['valueEn', 'valueVi'] }
+                    ],
+                    raw: false,
+                    nest: true
+                })
+
+                if (data && data.image) {
+                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                }
+                if (!data) data = {}
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
-    getAllDoctors:getAllDoctors,
-    saveDetailInforDoctors:saveDetailInforDoctors
+    getAllDoctors: getAllDoctors,
+    saveDetailInforDoctors: saveDetailInforDoctors,
+    getDetailDoctorById: getDetailDoctorById
 }
