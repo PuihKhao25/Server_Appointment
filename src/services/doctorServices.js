@@ -1,4 +1,4 @@
-// import raw from 'body-parser/lib/types/raw'
+
 import db from '../models/index'
 require('dotenv').config();
 import _ from 'lodash'
@@ -184,10 +184,38 @@ let bulkCreateSchedule = (data) => {
 
 }
 
+let getScheduleByDate = (doctorId, date) => {
+    return new Promise(async (resole, reject) => {
+        try {
+            if (!doctorId || !date) {
+                resole({
+                    errCode: 1,
+                    errMessage: 'Missing require parameter'
+                })
+            } else {
+                let dataSchedule = await db.schedule.findAll({
+                    where: {
+                        doctorId: doctorId,
+                        date: date
+                    }
+                })
+                if (!dataSchedule) dataSchedule = []
+                resole({
+                    errCode: 0,
+                    data: dataSchedule
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
     saveDetailInforDoctors: saveDetailInforDoctors,
     getDetailDoctorById: getDetailDoctorById,
-    bulkCreateSchedule: bulkCreateSchedule
+    bulkCreateSchedule: bulkCreateSchedule,
+    getScheduleByDate: getScheduleByDate
 }
