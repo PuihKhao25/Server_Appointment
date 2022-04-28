@@ -35,7 +35,6 @@ let displayGetCrud = async (req, res) => {
 
 let getEditCrud = async(req, res) => {
     let userId = req.query.id;
-    console.log(userId)
     if (userId) {
         let userData = await CRUDService.getUserInfoById(userId)
         // console.log("---------")
