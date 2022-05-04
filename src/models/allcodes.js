@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       allcodes.hasHooks(models.User, { foreignKey: 'positionId', as: 'positionData' })
       allcodes.hasHooks(models.User, { foreignKey: 'gender', as: 'genderData' })
+      allcodes.hasHooks(models.schedule, { foreignKey: 'timeType', as: 'timeTypeData' })
     }
   };
   allcodes.init({

@@ -55,12 +55,24 @@ let getAllDoctors = () => {
 let saveDetailInforDoctors = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown) {
+
+            if (!inputData.doctorId
+                || !inputData.contentHTML
+                || !inputData.contentMarkdown
+                || !inputData.action
+                || !inputData.selectedPrice
+                || !inputData.selectedPayment
+                || !inputData.selectedProvince
+                || !inputData.nameClinic
+                || !inputData.addressClinic
+                || !inputData.note
+            ) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing parameter'
                 })
             } else {
+                //upsert to markdown
                 if (inputData.action === 'CREATE') {
                     await db.Markdown.create({
                         contentHTML: inputData.contentHTML,
@@ -81,7 +93,39 @@ let saveDetailInforDoctors = (inputData) => {
                         await doctorMarkdown.save()
                     }
                 }
+                //upsert to doctor info table
 
+                let doctorInfor = await db.Doctor_infor.findOne({
+                    where: {
+                        doctorId: inputData.doctorId,
+                    },
+                    raw: false
+                })
+                if (doctorInfor) {
+                    //update
+                    doctorInfor.doctorId = inputData.doctorId;
+                    doctorInfor.priceId = inputData.selectedPrice;
+                    doctorInfor.provinceId = inputData.selectedProvince;
+                    doctorInfor.paymentId = inputData.selectedPayment;
+
+                    doctorInfor.nameClinic = inputData.nameClinic;
+                    doctorInfor.addressClinic = inputData.addressClinic;
+                    doctorInfor.note = inputData.note;
+
+                    await doctorInfor.save()
+                } else {
+                    //create
+                    await db.Doctor_infor.create({
+                        doctorId: inputData.doctorId,
+                        priceId: inputData.selectedPrice,
+                        provinceId: inputData.selectedProvince,
+                        paymentId: inputData.selectedPayment,
+
+                        nameClinic: inputData.nameClinic,
+                        addressClinic: inputData.addressClinic,
+                        note: inputData.note,
+                    })
+                }
                 resolve({
                     errCode: 0,
                     errMessage: 'Save infor doctor successed!'
@@ -155,17 +199,10 @@ let bulkCreateSchedule = (data) => {
                     attributes: ['timeType', 'date', 'doctorId', 'maxNumber'],
                     raw: true
                 });
-                //convert date
-                if (existing && existing.length > 0) {
-                    existing = existing.map(item => {
-                        item.date = new Date(item.date).getTime();
-                        return item;
-                    })
-                }
 
                 //compare different
                 let toCreate = _.differenceWith(schedule, existing, (a, b) => {
-                    return a.timeType === b.timeType && a.date === b.date;
+                    return a.timeType === b.timeType && +a.date === +b.date;
                 })
                 //create data
                 if (toCreate && toCreate.length > 0) {
@@ -197,7 +234,12 @@ let getScheduleByDate = (doctorId, date) => {
                     where: {
                         doctorId: doctorId,
                         date: date
-                    }
+                    },
+                    include: [
+                        { model: db.allcodes, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] }
+                    ],
+                    raw: false,
+                    nest: true
                 })
                 if (!dataSchedule) dataSchedule = []
                 resole({
