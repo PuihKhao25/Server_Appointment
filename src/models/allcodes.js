@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
       allcodes.hasHooks(models.User, { foreignKey: 'positionId', as: 'positionData' })
       allcodes.hasHooks(models.User, { foreignKey: 'gender', as: 'genderData' })
       allcodes.hasHooks(models.schedule, { foreignKey: 'timeType', as: 'timeTypeData' })
+
+      allcodes.hasHooks(models.Doctor_infor, { foreignKey: 'priceId', as: 'priceIdTypeData' })
+      allcodes.hasHooks(models.Doctor_infor, { foreignKey: 'provinceId', as: 'provinceIdTypeData' })
+      allcodes.hasHooks(models.Doctor_infor, { foreignKey: 'paymentId', as: 'paymentIdTypeData' })
     }
   };
   allcodes.init({
