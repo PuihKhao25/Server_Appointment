@@ -1,7 +1,8 @@
 import express from "express";
 import getHomePage from "../controllers/homeController";
 import userController from "../controllers/userControllers";
-import doctorController from "../controllers/doctorController"
+import doctorController from "../controllers/doctorController";
+import patientController from "../controllers/patientController"
 
 let router = express.Router();
 
@@ -20,6 +21,7 @@ let initWebRoutes = (app) => {
     router.put('/api/edit-user', userController.handleEditUser);
     router.delete('/api/delete-user', userController.handleDeleteUser); // rest API
     router.get('/api/allcode', userController.getAllCode);
+
     router.get('/api/top-doctor-home', doctorController.getTopDoctorHome);
     router.get('/api/get-all-doctors', doctorController.getAllDoctors);
     router.post('/api/save-infor-doctors', doctorController.postInforDoctors)
@@ -28,6 +30,8 @@ let initWebRoutes = (app) => {
     router.get('/api/get-schedule-doctor-by-date', doctorController.getScheduleByDate)
     router.get('/api/get-extra-infor-doctor-by-id', doctorController.getExtraInfoDoctorById)
     router.get('/api/get-profile-doctor-by-id', doctorController.getProfileDoctorById)
+
+    router.post('/api/patient-book-appointment', patientController.postBookAppointment);
 
     return app.use("/", router);
 }
