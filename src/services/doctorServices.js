@@ -250,7 +250,8 @@ let getScheduleByDate = (doctorId, date) => {
                         date: date
                     },
                     include: [
-                        { model: db.allcodes, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] }
+                        { model: db.allcodes, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.User, as: 'doctorData', attributes: ['firstName', 'lastName'] },
                     ],
                     raw: false,
                     nest: true
@@ -304,15 +305,15 @@ let getExtraInfoDoctorById = (idInput) => {
     })
 }
 
-let getProfileDoctorById = (inputId) =>{
-    return new Promise(async(resolve,reject)=>{
+let getProfileDoctorById = (inputId) => {
+    return new Promise(async (resolve, reject) => {
         try {
             if (!inputId) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing require parameter'
                 })
-            }else{
+            } else {
                 let data = await db.User.findOne({
                     where: {
                         id: inputId
@@ -365,5 +366,5 @@ module.exports = {
     bulkCreateSchedule: bulkCreateSchedule,
     getScheduleByDate: getScheduleByDate,
     getExtraInfoDoctorById: getExtraInfoDoctorById,
-    getProfileDoctorById:getProfileDoctorById
+    getProfileDoctorById: getProfileDoctorById
 }
