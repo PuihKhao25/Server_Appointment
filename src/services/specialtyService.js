@@ -57,8 +57,6 @@ let getDetailSpecialtyById = (inputId, location) => {
                     errMessage: 'Missing parameter'
                 })
             } else {
-
-
                 let data = await db.specialty.findOne({
                     where: {
                         id: inputId
@@ -66,36 +64,33 @@ let getDetailSpecialtyById = (inputId, location) => {
                     attributes: ['descriptionHTML', 'descriptionMarkdown']
                 })
                 if (data) {
-                    //do something
                     let doctorSpecialty = [];
-                    if (data) {
+                    if (location === 'ALL') {
                         doctorSpecialty = await db.Doctor_infor.findAll({
-                            where: { specialtyId: inputId },
+                            where: {
+                                specialtyId: inputId,
+
+                            },
                             attributes: ['doctorId', 'provinceId']
                         })
                     }else{
+                        // find by location
                         doctorSpecialty = await db.Doctor_infor.findAll({
-                            where: { 
+                            where:{
                                 specialtyId: inputId,
-                                provinceId:location
-                             },
+                                provinceId: location
+                            },
                             attributes: ['doctorId', 'provinceId']
                         })
                     }
-
-
-
-                    data.doctorSpecialty = doctorSpecialty
-
-                } else data = {}
+                    data.doctorSpecialty = doctorSpecialty;
+                }else data ={}
                 resolve({
                     errCode: 0,
                     errMessage: 'ok',
                     data
                 })
-
             }
-
         } catch (e) {
             reject(e)
 
