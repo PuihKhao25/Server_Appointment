@@ -57,7 +57,7 @@ let checkRequiredFields = (inputData) => {
         'selectedProvince', 'nameClinic', 'addressClinic', 'note', 'specialtyId'
     ]
     let isValid = true;
-    let element ='';
+    let element = '';
     for (let i = 0; i < arrFields.length; i++) {
         if (!inputData[arrFields[i]]) {
             isValid = false;
@@ -66,8 +66,8 @@ let checkRequiredFields = (inputData) => {
         }
     }
     return {
-        isValid:isValid,
-        element:element
+        isValid: isValid,
+        element: element
     }
 }
 
@@ -77,8 +77,7 @@ let saveDetailInforDoctors = (inputData) => {
 
             let checkObject = checkRequiredFields(inputData);
 
-            if(checkObject.isValid === false)
-            {
+            if (checkObject.isValid === false) {
                 resolve({
                     errCode: 1,
                     errMessage: `Missing parameter:${checkObject.element}`
@@ -123,8 +122,8 @@ let saveDetailInforDoctors = (inputData) => {
                     doctorInfor.nameClinic = inputData.nameClinic;
                     doctorInfor.addressClinic = inputData.addressClinic;
                     doctorInfor.note = inputData.note;
-                    doctorInfor.specialtyId = inputData.specialtyId   
-                    doctorInfor.clinicId = inputData.clinicId   
+                    doctorInfor.specialtyId = inputData.specialtyId
+                    doctorInfor.clinicId = inputData.clinicId
 
 
                     await doctorInfor.save()
@@ -139,7 +138,7 @@ let saveDetailInforDoctors = (inputData) => {
                         nameClinic: inputData.nameClinic,
                         addressClinic: inputData.addressClinic,
                         note: inputData.note,
-                        specialtyId: inputData.specialtyId ,
+                        specialtyId: inputData.specialtyId,
                         clinicId: inputData.clinicId
                     })
                 }
@@ -375,6 +374,44 @@ let getProfileDoctorById = (inputId) => {
     })
 }
 
+let getListPatientForDoctor = (doctorId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId || !date) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing require parameter'
+                })
+            } else {
+                let data = await db.booking.findAll({
+                    where: {
+                        statusId: 'S2',
+                        doctorId: doctorId,
+                        date: date
+                    },
+                    include: [
+                        {
+                            model: db.User, as: 'patientData',
+                            attributes: ['email', 'firstName', 'address', 'gender'],
+                            include: [
+                                { model: db.allcodes, as: 'genderData', attributes: ['valueEn', 'valueVi'] },
+                            ],
+                        },
+                    ],
+                    raw: false,
+                    nest: true
+                })
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
@@ -383,5 +420,6 @@ module.exports = {
     bulkCreateSchedule: bulkCreateSchedule,
     getScheduleByDate: getScheduleByDate,
     getExtraInfoDoctorById: getExtraInfoDoctorById,
-    getProfileDoctorById: getProfileDoctorById
+    getProfileDoctorById: getProfileDoctorById,
+    getListPatientForDoctor: getListPatientForDoctor
 }

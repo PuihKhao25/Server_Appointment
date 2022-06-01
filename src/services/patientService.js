@@ -17,6 +17,7 @@ let postBookAppointment = (data) => {
         try {
             if (!data.email || !data.doctorId || !data.timeType || !data.date
                 || !data.fullName
+                || !data.selectedGender || !data.address
             ) {
                 resolve({
                     errCode: 1,
@@ -37,9 +38,13 @@ let postBookAppointment = (data) => {
                 //upsert patient
                 let user = await db.User.findOrCreate({
                     where: { email: data.email },
-                    default: {
+                    defaults: {
                         email: data.email,
-                        roleId: 'R3'
+                        roleId: 'R3',
+                        gender: data.selectedGender,
+                        address: data.address,
+                        firstName: data.fullName
+
                     },
                 });
 
@@ -63,6 +68,7 @@ let postBookAppointment = (data) => {
                 }
 
                 resolve({
+
                     errCode: 0,
                     errMessage: 'Save patient success'
                 })
@@ -73,44 +79,44 @@ let postBookAppointment = (data) => {
     })
 }
 
- let postVerifyBookAppointment = (data)=>{
-     return new Promise(async(resolve, reject)=>{
-         try {
-             if(!data.token || !data.doctorId){
-                 resolve({
+let postVerifyBookAppointment = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.token || !data.doctorId) {
+                resolve({
                     errCode: 1,
                     errMessage: 'Missing parameter'
-                 })
-             }else{
-                 let appointment = await db.booking.findOne({
-                     where:{
-                         doctorId:data.doctorId,
-                         token: data.token,
-                         statusId:'S1'
-                     },
-                     raw:false
-                 })
-                 if(appointment){
-                     appointment.statusId ='S2';
-                     await appointment.save()
-                     resolve({
-                         errCode:0,
-                         errMessage:'Update the appointment success!'
-                     })
-                 }else{
+                })
+            } else {
+                let appointment = await db.booking.findOne({
+                    where: {
+                        doctorId: data.doctorId,
+                        token: data.token,
+                        statusId: 'S1'
+                    },
+                    raw: false
+                })
+                if (appointment) {
+                    appointment.statusId = 'S2';
+                    await appointment.save()
                     resolve({
-                        errCode:2,
-                        errMessage:'Appointment has been activated or does not exist'
+                        errCode: 0,
+                        errMessage: 'Update the appointment success!'
                     })
-                 }
-             }
-         } catch (e) {
-             reject(e)
-         }
-     })
+                } else {
+                    resolve({
+                        errCode: 2,
+                        errMessage: 'Appointment has been activated or does not exist'
+                    })
+                }
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
 }
 
 module.exports = {
     postBookAppointment: postBookAppointment,
-    postVerifyBookAppointment:postVerifyBookAppointment
+    postVerifyBookAppointment: postVerifyBookAppointment
 }
