@@ -397,6 +397,9 @@ let getListPatientForDoctor = (doctorId, date) => {
                                 { model: db.allcodes, as: 'genderData', attributes: ['valueEn', 'valueVi'] },
                             ],
                         },
+
+                        { model: db.allcodes, as: 'timeTypeDataPatient', attributes: ['valueEn', 'valueVi'] },
+
                     ],
                     raw: false,
                     nest: true
